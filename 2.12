@@ -1,0 +1,85 @@
+# 数组：移除元素
+
+### 我第一想法是采取首尾指针的方法
+并非是这种方法不能解决问题，但是容易出现一定的问题 我第一次提交的代码为：
+```c++
+class Solution {
+public:
+    int removeElement(vector<int>& nums, int val) {
+        int len = nums.size();
+        int first = 0;
+        int last = len - 1;
+        while (first <= last) {
+            if (nums[first] != val) {
+                first++;
+                // 指向前面第一个为val的值
+            }
+            if (nums[last] == val) {
+                last--;
+                // 指向后面第一个不为val的值
+            }
+
+            // 当换完了之后，first指向第一个val，last指向最后一个非val
+            if (first < last) {
+                nums[first] = nums[last];
+                nums[last] = val;
+                first++;
+                last--;
+            }
+        }
+        return last;
+    }
+};
+```
+### 很显然，存在很多问题：
+逻辑复杂性：当前逻辑试图通过两个指针从前向后和从后向前遍历数组来交换元素，但其实现方式较为复杂且容易出错。
+不必要的交换操作：在找到nums[first] != val和nums[last] == val的情况下，你的代码尝试交换这两个位置的值。实际上，在这个问题场景下，我们只需要覆盖掉等于val的值，而不需要严格意义上的“交换”。
+边界条件处理：对于空数组或者所有元素都是目标值的情况，原代码可能无法正确处理。
+修改之后的代码为：
+```c++
+class Solution {
+public:
+    int removeElement(vector<int>& nums, int val) {
+        int first = 0;
+        int last = nums.size() - 1;
+
+        while (first <= last) {
+            // Move the 'first' pointer forward until it points to an element equal to 'val'
+            while (first <= last && nums[first] != val) {
+                first++;
+            }
+            // Move the 'last' pointer backward until it points to an element not equal to 'val'
+            while (first <= last && nums[last] == val) {
+                last--;
+            }
+
+            // If 'first' still less than or equal to 'last', swap elements and move both pointers inward
+            if (first < last) {
+                nums[first++] = nums[last--];
+            }
+        }
+
+
+        return first;
+    }
+};
+```
+
+### 感觉就麻烦了好多，相比之下，我在看来Carl的思路之后，很快就写出来快慢指针的代码：
+```c++
+class Solution {
+public:
+    int removeElement(vector<int>& nums, int val) {
+        int k = 0; // 新数组的长度
+
+        for (int i = 0; i < nums.size(); i++) {
+            if (nums[i] != val) {
+                nums[k] = nums[i];
+                k++;
+            }
+        }
+
+        return k;
+    }
+};
+```
